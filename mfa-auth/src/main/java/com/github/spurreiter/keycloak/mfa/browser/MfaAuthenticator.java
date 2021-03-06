@@ -4,6 +4,7 @@ import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.authenticators.browser.OTPFormAuthenticator;
+import org.keycloak.common.util.Time;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.services.messages.Messages;
@@ -12,6 +13,7 @@ import org.keycloak.theme.Theme;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -28,6 +30,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
 
     private static final Logger log = Logger.getLogger(MfaAuthenticator.class);
 
+    public static final String MFA_CHALLENGE_SENT = "mfaChallengeSent";
     public static final String OTP_AUTH = "otpAuth";
     public static final String OTP_ROLE = "otp:auth";
 
@@ -93,6 +96,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
             // success
             if (error == null) {
                 log.infof("authentication successful. realm=%s username=%s", realm.getName(), username);
+                context.getAuthenticationSession().removeAuthNote(MFA_CHALLENGE_SENT);
                 context.success();
                 return;
             }
@@ -146,8 +150,13 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
 
     private void requestChallenge(AuthenticationFlowContext context, String username,
             AuthenticationSessionModel authSession) {
-        MfaResponse response = MfaHelper.getMfaRequest(context).send(context.getUser().getAttributes());
-        String error = response.getError();
+        String error = null;
+
+        if (authSession.getAuthNote(MFA_CHALLENGE_SENT) == null) {
+            authSession.setAuthNote(MFA_CHALLENGE_SENT, MFA_CHALLENGE_SENT);
+            MfaResponse response = MfaHelper.getMfaRequest(context).send(context.getUser().getAttributes());
+            error = response.getError();
+        }
 
         if (error == null) {
             Response formResponse = createChallengeFormResponse(context, error);
