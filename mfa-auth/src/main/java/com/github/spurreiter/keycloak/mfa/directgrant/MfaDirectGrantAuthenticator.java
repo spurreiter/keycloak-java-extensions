@@ -3,10 +3,7 @@ package com.github.spurreiter.keycloak.mfa.directgrant;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
-import org.keycloak.authentication.CredentialValidator;
 import org.keycloak.authentication.authenticators.directgrant.AbstractDirectGrantAuthenticator;
-import org.keycloak.credential.CredentialProvider;
-import org.keycloak.credential.OTPCredentialProvider;
 import org.keycloak.models.UserModel;
 
 import javax.ws.rs.core.MultivaluedMap;

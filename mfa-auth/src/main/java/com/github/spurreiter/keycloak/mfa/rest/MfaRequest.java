@@ -96,10 +96,10 @@ public class MfaRequest {
         return headers;
     }
 
-    private static String jsonBuilder(Map<String, List<String>> userAttributes) {
-        HashMap<String, Object> map = new HashMap<>();
-        return jsonBuilder(userAttributes, map);
-    }
+    // private static String jsonBuilder(Map<String, List<String>> userAttributes) {
+    //     HashMap<String, Object> map = new HashMap<>();
+    //     return jsonBuilder(userAttributes, map);
+    // }
 
     private static String jsonBuilder(Map<String, List<String>> userAttributes, HashMap<String, Object> map) {
         userAttributes.entrySet().stream().forEach(e -> {

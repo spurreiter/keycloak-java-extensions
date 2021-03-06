@@ -9,7 +9,6 @@
       <module name="javax.persistence.api" export="true"/>
       <module name="org.hibernate" export="true"/>
       <module name="org.liquibase" export="true"/>
-      <module name="org.javassist" export="true"/>
     </dependencies>
   </deployment>
 </jboss-deployment-structure>
