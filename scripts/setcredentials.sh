@@ -3,7 +3,7 @@
 realm=my
 
 _exec(){
-  docker exec -it kc $@
+  docker exec -it kc-ext $@
 }
 _kcadm(){
   _exec /opt/jboss/keycloak/bin/kcadm.sh $@
@@ -15,7 +15,7 @@ _auth(){
 #   _kcadm create realms -s realm=$realm -s enabled=true
 # }
 _createUser(){
-  _kcadm create users -r $realm -s username="$1" -s enabled=true
+  _kcadm create users -r $realm -s username="$1" -s enabled=true $3
   _setPassword $1 $2
 }
 _setPassword(){
@@ -28,6 +28,6 @@ _setClientPassword(){
 
 # _exec sh
 _auth
-_createUser alice alice
+_createUser alice alice "-s email=alice@local.my -s emailVerified=true -s attributes.otpAuth=force" 
 _createUser bob bob
 _setClientPassword my-client d0b8122f-8dfb-46b7-b68a-f5cc4e25d000

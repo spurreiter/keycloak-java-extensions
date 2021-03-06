@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.spurreiter.keycloak</groupId>
-    <version>1.0.0</version>
+    <version>1.1.0-SNAPSHOT</version>
     <artifactId>keycloak-java-extensions</artifactId>
     <packaging>pom</packaging>
 
     <modules>
         <module>request-header-oidc-mapper</module>
+        <module>mfa-auth</module>
+        <module>extensions-ear</module>
     </modules>
 
     <properties>
-
         <!-- general settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
@@ -22,63 +22,155 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <!-- dependency versions -->
-        <lombok.version>1.18.12</lombok.version>
+        <keycloak.version>12.0.4</keycloak.version>
 
-        <keycloak.version>11.0.3</keycloak.version>
-        <auto-service.version>1.0-rc7</auto-service.version>
-        <jackson.version>2.10.2</jackson.version>
-        <resteasy-jaxrs.version>3.12.1.Final</resteasy-jaxrs.version>
-        <jboss-servlet-api.version>2.0.0.Final</jboss-servlet-api.version>
+        <lombok.version>1.18.20</lombok.version>
+        <jboss-jaxrs-api.version>2.0.1.Final</jboss-jaxrs-api.version>
+        <jackson.version>2.12.2</jackson.version>
+        <jboss-logging.version>3.4.1.Final</jboss-logging.version>
+
+        <!-- tests -->
+        <junit.version>5.7.1</junit.version>
+        <jmockit.version>1.49</jmockit.version>
+        <junit-platform.version>1.7.1</junit-platform.version>
+
+        <maven-ear-plugin.version>3.0.2</maven-ear-plugin.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     </properties>
+
+    <!--distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://nexus.x.x/repository/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>releases</id>
+            <url>http://nexus.x.x/repository/releases/</url>
+        </repository>
+    </distributionManagement-->
 
     <dependencyManagement>
         <dependencies>
-
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-testsuite-utils</artifactId>
-                <version>${keycloak.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jaxrs</artifactId>
-                <version>${resteasy-jaxrs.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jboss.spec.javax.servlet</groupId>
-                <artifactId>jboss-servlet-api_4.0_spec</artifactId>
-                <version>${jboss-servlet-api.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
+            <!--dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
                 <scope>provided</scope>
-                <optional>true</optional>
+            </dependency-->
+
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>${jboss-logging.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
-                <groupId>com.google.auto.service</groupId>
-                <artifactId>auto-service</artifactId>
-                <version>${auto-service.version}</version>
+                <groupId>org.jboss.spec.javax.ws.rs</groupId>
+                <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+                <version>${jboss-jaxrs-api.version}</version>
                 <scope>provided</scope>
-                <optional>true</optional>
             </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- tests -->
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-launcher</artifactId>
+                <version>${junit-platform.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jmockit</groupId>
+                <artifactId>jmockit</artifactId>
+                <version>${jmockit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- keycloak -->
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-core</artifactId>
+                <version>${keycloak.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-server-spi</artifactId>
+                <version>${keycloak.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-server-spi-private</artifactId>
+                <version>${keycloak.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-services</artifactId>
+                <version>${keycloak.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-model-jpa</artifactId>
+                <version>${keycloak.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
+                <!--plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.2.0</version>
+                </plugin-->
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ear-plugin</artifactId>
+                    <version>${maven-ear-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <forkCount>1</forkCount>
+                        <runOrder>alphabetical</runOrder>
+                        <argLine>
+                            -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
+                        </argLine>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

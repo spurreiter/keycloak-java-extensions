@@ -1,2 +1,12 @@
 target/
 .DS_Store
+.vscode
+.classpath
+.project
+.factorypath
+.settings
+deployments/*-SNAPSHOT.jar
+deployments/*-SNAPSHOT.ear
+node_modules
+scripts/configuration/
+*.bak

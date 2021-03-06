@@ -1,0 +1,2 @@
+com.github.spurreiter.keycloak.mfa.browser.MfaAuthenticatorFactory
+com.github.spurreiter.keycloak.mfa.directgrant.MfaDirectGrantAuthenticator

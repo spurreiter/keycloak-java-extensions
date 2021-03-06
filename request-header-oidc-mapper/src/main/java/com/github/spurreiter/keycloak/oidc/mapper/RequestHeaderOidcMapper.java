@@ -1,6 +1,8 @@
 package com.github.spurreiter.keycloak.oidc.mapper;
 
 import org.jboss.logging.Logger;
+import org.keycloak.OAuthErrorException;
+import org.keycloak.authentication.authenticators.client.ClientAuthUtil;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.ProtocolMapperModel;
@@ -18,11 +20,15 @@ import org.keycloak.representations.IDToken;
 
 import java.util.List;
 
-public class RequestHeaderOidcMapper extends AbstractOIDCProtocolMapper implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+
+public class RequestHeaderOidcMapper extends AbstractOIDCProtocolMapper
+        implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
 
     private static final String PROVIDER_ID = "request-header-oidc-mapper";
 
-    private static final Logger LOGGER = Logger.getLogger(RequestHeaderOidcMapper.class);
+    private static final Logger log = Logger.getLogger(RequestHeaderOidcMapper.class);
 
     private static final List<ProviderConfigProperty> CONFIG_PROPERTIES;
 
@@ -31,21 +37,13 @@ public class RequestHeaderOidcMapper extends AbstractOIDCProtocolMapper implemen
     static {
 
         CONFIG_PROPERTIES = ProviderConfigurationBuilder.create()
-                .property()
-                .name(CONFIG_PROPERTY)
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .label("Request Header")
-                .helpText("Request Header Name to map into token")
-                .defaultValue("X-Request")
-                .add()
 
-                .property()
-                .name(ProtocolMapperUtils.MULTIVALUED)
-                .label(ProtocolMapperUtils.MULTIVALUED_LABEL)
-                .helpText(ProtocolMapperUtils.MULTIVALUED_HELP_TEXT)
-                .type(ProviderConfigProperty.BOOLEAN_TYPE)
-                .defaultValue(false)
-                .add()
+                .property().name(CONFIG_PROPERTY).type(ProviderConfigProperty.STRING_TYPE).label("Request Header")
+                .helpText("Request Header Name to map into token").defaultValue("X-Request").add()
+
+                .property().name(ProtocolMapperUtils.MULTIVALUED).label(ProtocolMapperUtils.MULTIVALUED_LABEL)
+                .helpText(ProtocolMapperUtils.MULTIVALUED_HELP_TEXT).type(ProviderConfigProperty.BOOLEAN_TYPE)
+                .defaultValue(false).add()
 
                 .build();
 
@@ -78,16 +76,27 @@ public class RequestHeaderOidcMapper extends AbstractOIDCProtocolMapper implemen
     }
 
     @Override
-    protected void setClaim(IDToken token, ProtocolMapperModel mappingModel, UserSessionModel userSession, KeycloakSession keycloakSession, ClientSessionContext clientSessionCtx) {
+    protected void setClaim(IDToken token, ProtocolMapperModel mappingModel, UserSessionModel userSession,
+            KeycloakSession keycloakSession, ClientSessionContext clientSessionCtx) {
 
         String requestHeaderName = mappingModel.getConfig().getOrDefault(CONFIG_PROPERTY, "defaultProperty");
 
         List<String> headers = keycloakSession.getContext().getRequestHeaders().getRequestHeader(requestHeaderName);
 
-        String claimValue = headers.get(0);
+        String mapperName = mappingModel.getName();
+        String clientId = keycloakSession.getContext().getClient().getClientId();
 
-        LOGGER.debugf("setClaim %s=%s", mappingModel.getName(), claimValue);
+        try {
+            String claimValue = headers.get(0);
+            log.infof("mapClaim mapper=%s %s=%s clientid=%s", mapperName,
+                    mappingModel.getConfig().get(OIDCAttributeMapperHelper.TOKEN_CLAIM_NAME), claimValue, clientId);
+            OIDCAttributeMapperHelper.mapClaim(token, mappingModel, claimValue);
+        } catch (Exception e) {
+            log.warnf("header missing. mapper=%s clientid=%s", mapperName, clientId);
+            Response response = ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),
+                    OAuthErrorException.INVALID_REQUEST, "Header missing");
 
-        OIDCAttributeMapperHelper.mapClaim(token, mappingModel, claimValue);
+            throw new WebApplicationException(response);
+        }
     }
 }
