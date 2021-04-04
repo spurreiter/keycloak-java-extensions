@@ -90,8 +90,6 @@ public class MfaResetCredential implements Authenticator, AuthenticatorFactory {
             return;
         }
 
-        logger.infof("foobar=%s", MfaHelper.getConfig(context).get(USE_REALM_EMAIL_PROVIDER));
-
         EventBuilder event = context.getEvent();
         // we don't want people guessing usernames, so if there is a problem, just
         // continuously challenge
@@ -248,7 +246,9 @@ public class MfaResetCredential implements Authenticator, AuthenticatorFactory {
     }
 
     public static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-            AuthenticationExecutionModel.Requirement.REQUIRED };
+            AuthenticationExecutionModel.Requirement.REQUIRED, 
+            AuthenticationExecutionModel.Requirement.DISABLED 
+        };
 
     @Override
     public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
