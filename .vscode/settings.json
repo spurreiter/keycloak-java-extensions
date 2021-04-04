@@ -1,0 +1,11 @@
+{
+  "java.test.config": [
+    {
+      "name": "jmockit",
+      "workingDirectory": "${workspaceFolder}",
+      "vmargs":[
+        "-javaagent:${workspaceFolder}/.vscode/jmockit-1.49.jar"
+      ]
+    }
+  ]
+}
