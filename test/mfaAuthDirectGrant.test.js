@@ -1,7 +1,8 @@
 const supertest = require('supertest')
 const assert = require('assert')
 
-const { CONFIG, testConnectKeycloak, mfaMockServer } = require('./support.js')
+const config = require('./config.js')
+const { testConnectKeycloak, mfaMockServer } = require('./support.js')
 
 describe('mfa-auth direct grant', function () {
   const username = 'alice'
@@ -9,18 +10,19 @@ describe('mfa-auth direct grant', function () {
   const clientId = 'my-server'
 
   before(function () {
-    return testConnectKeycloak()
+    // console.log(config)
+    return testConnectKeycloak(config)
   })
 
   before(function (done) {
-    this.app = mfaMockServer().start({ done })
+    this.app = mfaMockServer().start({ ...config.rest, done })
   })
   after(function () {
     this.app.stop()
   })
 
   it('shall start otp sending', function () {
-    return supertest(CONFIG.keycloak.url)
+    return supertest(config.keycloak.url)
       .post('/auth/realms/my/protocol/openid-connect/token')
       .set({
         'X-Request-ID': 'e140abbf-4bf1-4e2e-b579-fa1f81b8ab08'
@@ -40,7 +42,7 @@ describe('mfa-auth direct grant', function () {
   })
 
   it('shall fail on wrong otp value', function () {
-    return supertest(CONFIG.keycloak.url)
+    return supertest(config.keycloak.url)
       .post('/auth/realms/my/protocol/openid-connect/token')
       .set({
         'X-Request-ID': 'e140abbf-4bf1-4e2e-b579-fa1f81b8ab08'
@@ -50,7 +52,7 @@ describe('mfa-auth direct grant', function () {
         client_id: clientId,
         grant_type: 'password',
         scope: 'openid',
-        otp: '000000',
+        otp: '100000',
         username,
         password
       })
@@ -61,7 +63,7 @@ describe('mfa-auth direct grant', function () {
   })
 
   it('shall succeed on valid otp value', function () {
-    return supertest(CONFIG.keycloak.url)
+    return supertest(config.keycloak.url)
       .post('/auth/realms/my/protocol/openid-connect/token')
       .set({
         'X-Request-ID': 'e140abbf-4bf1-4e2e-b579-fa1f81b8ab08'
@@ -71,7 +73,7 @@ describe('mfa-auth direct grant', function () {
         client_id: clientId,
         grant_type: 'password',
         scope: 'openid',
-        otp: '123456',
+        otp: '000000',
         username,
         password
       })

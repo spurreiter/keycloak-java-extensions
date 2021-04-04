@@ -9,7 +9,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha"
+    "start": "node test/dev.js",
+    "test": "DEBUG=test* mocha"
   },
   "repository": {
     "type": "git",
@@ -23,14 +24,16 @@
   },
   "homepage": "https://github.com/spurreiter/keycloak-java-extensions#readme",
   "devDependencies": {
-    "debug": "^4.3.1",
-    "eslint": "^7.21.0",
+    "debug": "^4.3.2",
+    "eslint": "^7.25.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
     "express": "^4.17.1",
-    "mocha": "^8.3.1",
+    "express-session": "^1.17.1",
+    "keycloak-connect": "^12.0.4",
+    "mocha": "^8.3.2",
     "supertest": "^6.1.3"
   }
 }

@@ -1,12 +1,6 @@
 const supertest = require('supertest')
 const express = require('express')
-const log = require('debug')('test')
-
-const CONFIG = {
-  keycloak: {
-    url: 'http://localhost:8080'
-  }
-}
+const log = require('debug')('test:mfa')
 
 /**
  * if fails start docker container with
@@ -14,11 +8,10 @@ const CONFIG = {
  * then add users with
  * `./scripts/setcredentials.sh`
  */
-const testConnectKeycloak = () => supertest(CONFIG.keycloak.url).get('/auth').expect(303)
+const testConnectKeycloak = (config) => supertest(config.keycloak.url).get('/auth').expect(303)
 
-const mfaMockServer = (scenario) => {
+const mfaMockServer = () => {
   const app = express()
-  let server
 
   // logger and body-parser - is unsafe
   app.use((req, res, next) => {
@@ -26,13 +19,18 @@ const mfaMockServer = (scenario) => {
     req.on('data', chunk => { text += chunk.toString() })
     req.on('end', () => {
       const { method, url } = req
-      req.body = JSON.parse(text)
+      try {
+        req.body = JSON.parse(text)
+      } catch (e) {
+        req.body = {}
+      }
       log({ method, url, text })
       next()
     })
   })
   app.post('/mfa', (req, res) => {
-    const { email: destination, nonce } = req.body
+    const { email, phoneNumber, nonce } = req.body
+    const destination = phoneNumber || email
     const expiresAt = Date.now() + 300000
     let status = 200
     let body = { destination, expiresAt, nonce }
@@ -42,29 +40,42 @@ const mfaMockServer = (scenario) => {
     }
     res.status(status).json(body)
   })
-  app.put('/mfa/verify', (req, res) => {
+  app.put('/mfa', (req, res) => {
     const { code, nonce } = req.body
     let status = 200
     let body = { nonce }
-    if (code !== '123456') {
+    if (code !== '000000') {
       status = 403
       body = { status, error: 'mfa_invalid' }
     }
     res.status(status).json(body)
   })
-  app.start = ({ port = 1080, done }) => {
-    server = app.listen(port, '127.0.0.1', done)
+  app.post('/mfa/send-email', (req, res) => {
+    const { link, email, nonce, requestId } = req.body
+    let status = 200
+    let body = { nonce }
+    if (!link || !email) {
+      status = 500
+      body = {
+        requestId,
+        error: 'Missing link or email',
+        status
+      }
+    }
+    res.status(status).json(body)
+  })
+  app.start = ({ host = 'localhost', port = 1080, done }) => {
+    app._server = app.listen(port, host, done)
     return app
   }
   app.stop = () => {
-    server && server.close()
+    app._server && app._server.close()
   }
 
   return app
 }
 
 module.exports = {
-  CONFIG,
   testConnectKeycloak,
   mfaMockServer
 }
