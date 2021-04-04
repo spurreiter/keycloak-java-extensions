@@ -18,16 +18,14 @@ import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_U
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_PWD;
 import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_AUTH_KEY;
 import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_ROLE_KEY;
-import static com.github.spurreiter.keycloak.mfa.browser.MfaAuthenticator.OTP_AUTH;
-import static com.github.spurreiter.keycloak.mfa.browser.MfaAuthenticator.OTP_ROLE;
 
-public class MfaAuthenticatorFactory implements AuthenticatorFactory {
+public class MfaVerifyEmailFactory implements AuthenticatorFactory {
 
-    public static final String PROVIDER_ID = "auth-mfa-form";
+    public static final String PROVIDER_ID = "verify-email-mfa-form";
 
     @Override
     public Authenticator create(KeycloakSession session) {
-        return new MfaAuthenticator(session);
+        return new MfaVerifyEmail(session);
     }
 
     @Override
@@ -73,12 +71,12 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public String getDisplayType() {
-        return "MFA Auth Form";
+        return "MFA Verify Email";
     }
 
     @Override
     public String getHelpText() {
-        return "Validates a OTP on a separate OTP form. OTP is sent via REST endpoint.";
+        return "Verifies Email.";
     }
 
     @Override
@@ -88,7 +86,7 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
         restEndpoint.setName(REST_ENDPOINT);
         restEndpoint.setLabel("REST endpoint");
         restEndpoint.setHelpText("REST endpoint to send OTP.");
-        restEndpoint.setDefaultValue("http://localhost:1080/mfa");
+        restEndpoint.setDefaultValue("http://localhost:1080/mfa/verify-email");
 
         ProviderConfigProperty restEndpointUser = new ProviderConfigProperty();
         restEndpointUser.setType(STRING_TYPE);
@@ -107,14 +105,12 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
         forceOtpUserAttribute.setName(OTP_AUTH_KEY);
         forceOtpUserAttribute.setLabel("OTP control User Attribute");
         forceOtpUserAttribute.setHelpText("The name of the user attribute to explicitly control OTP auth.");
-        forceOtpUserAttribute.setDefaultValue(OTP_AUTH);
 
         ProviderConfigProperty forceOtpRole = new ProviderConfigProperty();
         forceOtpRole.setType(ROLE_TYPE);
         forceOtpRole.setName(OTP_ROLE_KEY);
         forceOtpRole.setLabel("Force OTP for Role");
         forceOtpRole.setHelpText("OTP is always required if user has the given Role.");
-        forceOtpRole.setDefaultValue(OTP_ROLE);
 
         return asList(restEndpoint, restEndpointUser, restEndpointPwd, forceOtpUserAttribute, forceOtpRole);
     }

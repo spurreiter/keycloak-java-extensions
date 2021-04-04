@@ -9,6 +9,7 @@ import org.keycloak.models.UserModel;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import com.github.spurreiter.keycloak.mfa.rest.MfaRequest;
 import com.github.spurreiter.keycloak.mfa.rest.MfaResponse;
 import com.github.spurreiter.keycloak.mfa.util.MfaHelper;
 
@@ -30,9 +31,9 @@ import java.util.Locale;
 
 import static java.util.Arrays.asList;
 
-import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.REST_ENDPOINT;
-import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.REST_ENDPOINT_USER;
-import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.REST_ENDPOINT_PWD;
+import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT;
+import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_USER;
+import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_PWD;
 import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_AUTH_KEY;
 import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_ROLE_KEY;
 
@@ -65,7 +66,7 @@ public class MfaDirectGrantAuthenticator extends AbstractDirectGrantAuthenticato
 
         if (otp == null || otp.isEmpty()) {
             log.infof("authenticate for username=%s", username);
-            MfaResponse response = MfaHelper.getMfaRequest(context).send(context.getUser().getAttributes());
+            MfaResponse response = MfaRequest.buildRequest(context).send(context.getUser().getAttributes());
             String error = response.getError();
 
             if (error == null) {
@@ -78,7 +79,7 @@ public class MfaDirectGrantAuthenticator extends AbstractDirectGrantAuthenticato
             challengeResponseFailed(context, error, getLocaleError(context, error));
             return;
         }
-        MfaResponse response = MfaHelper.getMfaRequest(context).verify(context.getUser().getAttributes(), otp);
+        MfaResponse response = MfaRequest.buildRequest(context).verify(context.getUser().getAttributes(), otp);
         String error = response.getError();
 
         if (error != null) {
@@ -119,7 +120,7 @@ public class MfaDirectGrantAuthenticator extends AbstractDirectGrantAuthenticato
 
     @Override
     public String getDisplayType() {
-        return "Mfa Direct Grant";
+        return "MFA Direct Grant";
     }
 
     @Override

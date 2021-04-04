@@ -13,19 +13,8 @@ import org.keycloak.models.utils.KeycloakModelUtils;
 
 public class MfaHelper {
     // configuration
-    public static final String REST_ENDPOINT = "restEndpoint";
-    public static final String REST_ENDPOINT_USER = "restEndpointUser";
-    public static final String REST_ENDPOINT_PWD = "restEndpointPwd";
     public static final String OTP_AUTH_KEY = "otpAuthAttribute";
     public static final String OTP_ROLE_KEY = "otpAuthRole";
-
-    public static MfaRequest getMfaRequest(AuthenticationFlowContext context) {
-        Map<String, String> config = MfaHelper.getConfig(context);
-        String url = config.get(REST_ENDPOINT);
-        String basicUser = config.get(REST_ENDPOINT_USER);
-        String basicPass = config.get(REST_ENDPOINT_PWD);
-        return new MfaRequest(url).setBasicAuth(basicUser, basicPass).setRequestId(getRequestId(context));
-    }
 
     public static String getRequestId(AuthenticationFlowContext context) {
         try {

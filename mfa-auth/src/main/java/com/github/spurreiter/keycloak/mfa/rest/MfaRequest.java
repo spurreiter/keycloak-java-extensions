@@ -1,5 +1,6 @@
 package com.github.spurreiter.keycloak.mfa.rest;
 
+import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.common.util.Base64;
 import org.jboss.logging.Logger;
 
@@ -21,9 +22,14 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.spurreiter.keycloak.mfa.util.MfaHelper;
 
 public class MfaRequest {
     private static final Logger log = Logger.getLogger(MfaRequest.class);
+
+    public static final String REST_ENDPOINT = "restEndpoint";
+    public static final String REST_ENDPOINT_USER = "restEndpointUser";
+    public static final String REST_ENDPOINT_PWD = "restEndpointPwd";
 
     private String url;
 
@@ -38,6 +44,14 @@ public class MfaRequest {
         this.url = url;
     }
 
+    public static MfaRequest buildRequest(AuthenticationFlowContext context) {
+        Map<String, String> config = MfaHelper.getConfig(context);
+        String url = config.get(REST_ENDPOINT);
+        String basicUser = config.get(REST_ENDPOINT_USER);
+        String basicPass = config.get(REST_ENDPOINT_PWD);
+        return new MfaRequest(url).setBasicAuth(basicUser, basicPass).setRequestId(MfaHelper.getRequestId(context));
+    }
+    
     public MfaResponse send(Map<String, List<String>> userAttributes) {
         String nonce = UUID.randomUUID().toString();
         HashMap<String, Object> map = new HashMap<>();
@@ -61,6 +75,22 @@ public class MfaRequest {
         String json = jsonBuilder(userAttributes, map);
         Response response = request("PUT", "/verify", Entity.entity(json, MediaType.APPLICATION_JSON));
         logResponse(response, "verify");
+
+        MfaResponse mfaRes = new MfaResponse(response);
+        mfaRes.verifyNonce(nonce);
+        return mfaRes;
+    }
+
+    public MfaResponse sendVerifyEmail(Map<String, List<String>> userAttributes, String link, long expirationInMinutes) {
+        String nonce = UUID.randomUUID().toString();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("link", link);
+        map.put("expirationInMinutes", expirationInMinutes);
+        map.put("nonce", nonce);
+
+        String json = jsonBuilder(userAttributes, map);
+        Response response = request("POST", "/", Entity.entity(json, MediaType.APPLICATION_JSON));
+        logResponse(response, "verify-email");
 
         MfaResponse mfaRes = new MfaResponse(response);
         mfaRes.verifyNonce(nonce);

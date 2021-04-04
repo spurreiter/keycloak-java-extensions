@@ -221,6 +221,14 @@
           "priority": 21,
           "requirement": "REQUIRED",
           "userSetupAllowed": false
+        },
+        {
+          "authenticator": "verify-email-mfa-form",
+          "authenticatorConfig": "my",
+          "autheticatorFlow": false,
+          "priority": 22,
+          "requirement": "REQUIRED",
+          "userSetupAllowed": false
         }
       ],
       "builtIn": false,
@@ -654,7 +662,7 @@
     {
       "alias": "my",
       "config": {
-        "otpAuthAttribute": "otpAuth",
+        "otpAuthAttribute": "otpauth",
         "otpAuthRole": "otp:auth",
         "restEndpoint": "http://host.docker.internal:1080/mfa"
       },
@@ -663,13 +671,18 @@
     {
       "alias": "my",
       "config": {
-        "otpAuthAttribute": "otpAuth",
+        "otpAuthAttribute": "otpauth",
         "otpAuthRole": "otp:auth",
-        "restEndpoint": "http://host.docker.internal:1080/mfa",
-        "restEndpointPwd": "bar",
-        "restEndpointUser": "foo"
+        "restEndpoint": "http://host.docker.internal:1080/mfa"
       },
       "id": "2cd63811-2dc6-409b-a3bd-24e3bd082523"
+    },
+    {
+      "alias": "my",
+      "config": {
+        "restEndpoint": "http://host.docker.internal:1080/mfa/verify-email"
+      },
+      "id": "305b6f68-4b61-4c1b-8673-90385d6a3d9a"
     },
     {
       "alias": "review profile config",
@@ -1528,7 +1541,6 @@
       "clientId": "my-server",
       "consentRequired": false,
       "defaultClientScopes": [
-        "web-origins",
         "role_list",
         "profile",
         "roles",
@@ -1873,7 +1885,7 @@
   "registrationAllowed": false,
   "registrationEmailAsUsername": false,
   "registrationFlow": "registration",
-  "rememberMe": false,
+  "rememberMe": true,
   "requiredActions": [
     {
       "alias": "CONFIGURE_TOTP",
@@ -1943,7 +1955,7 @@
     "password"
   ],
   "resetCredentialsFlow": "reset credentials",
-  "resetPasswordAllowed": false,
+  "resetPasswordAllowed": true,
   "revokeRefreshToken": false,
   "roles": {
     "client": {
@@ -2338,7 +2350,7 @@
       "username": "service-account-my-client"
     }
   ],
-  "verifyEmail": false,
+  "verifyEmail": true,
   "waitIncrementSeconds": 60,
   "webAuthnPolicyAcceptableAaguids": [],
   "webAuthnPolicyAttestationConveyancePreference": "not specified",

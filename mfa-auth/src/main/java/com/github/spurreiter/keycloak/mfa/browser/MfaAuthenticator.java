@@ -4,7 +4,6 @@ import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.authenticators.browser.OTPFormAuthenticator;
-import org.keycloak.common.util.Time;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.services.messages.Messages;
@@ -13,13 +12,14 @@ import org.keycloak.theme.Theme;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.Objects;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import com.github.spurreiter.keycloak.mfa.rest.MfaRequest;
 import com.github.spurreiter.keycloak.mfa.rest.MfaResponse;
 import com.github.spurreiter.keycloak.mfa.util.MfaHelper;
+import com.github.spurreiter.keycloak.mfa.util.UserAttributes;
 
 import org.keycloak.events.Errors;
 import org.keycloak.forms.login.LoginFormsProvider;
@@ -31,7 +31,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
     private static final Logger log = Logger.getLogger(MfaAuthenticator.class);
 
     public static final String MFA_CHALLENGE_SENT = "mfaChallengeSent";
-    public static final String OTP_AUTH = "otpAuth";
+    public static final String OTP_AUTH = "otpauth";
     public static final String OTP_ROLE = "otp:auth";
 
     public static final String MFA_CHALLENGE_START = "mfaChallengeStart";
@@ -45,13 +45,15 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
     // 1st step
     @Override
     public void authenticate(AuthenticationFlowContext context) {
-        if (!MfaHelper.matchCondition(context)) {
+        UserModel user = context.getUser();
+        String username = user.getUsername();
+
+        boolean needsOtpAuth = MfaHelper.matchCondition(context);
+
+        if (!needsOtpAuth && UserAttributes.isPhoneVerifiedOrNull(user)) {
             context.success();
             return;
         }
-
-        UserModel user = context.getUser();
-        String username = user.getUsername();
 
         log.infof("authenticate for username=%s", username);
 
@@ -61,10 +63,6 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
     // 2nd step
     @Override
     public void action(AuthenticationFlowContext context) {
-        if (!MfaHelper.matchCondition(context)) {
-            context.success();
-            return;
-        }
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
 
         if (formData.containsKey("cancel")) {
@@ -78,23 +76,27 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
         String username = user.getUsername();
         String xRequestId = MfaHelper.getRequestId(context);
         boolean doExit = false;
+
         log.infof("action. requestid=%s realm=%s username=%s", xRequestId, realm.getName(), username);
 
         MfaResponse response;
         String error;
 
         if (formData.containsKey("resend")) {
-            response = MfaHelper.getMfaRequest(context).send(context.getUser().getAttributes());
+            response = MfaRequest.buildRequest(context).send(context.getUser().getAttributes());
             error = response.getError();
             doExit = error != null;
         } else {
             String code = formData.getFirst("challenge_input");
-            response = MfaHelper.getMfaRequest(context).verify(context.getUser().getAttributes(), code);
+            response = MfaRequest.buildRequest(context).verify(context.getUser().getAttributes(), code);
             error = response.getError();
             doExit = !MfaResponse.ERR_INVALID.equals(error);
 
             // success
             if (error == null) {
+                if (!UserAttributes.isPhoneVerified(user)) {
+                    user.setSingleAttribute(UserAttributes.PHONE_NUMBER_VERIFIED, "true");                       
+                }
                 log.infof("authentication successful. realm=%s username=%s", realm.getName(), username);
                 context.getAuthenticationSession().removeAuthNote(MFA_CHALLENGE_SENT);
                 context.success();
@@ -154,7 +156,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
 
         if (authSession.getAuthNote(MFA_CHALLENGE_SENT) == null) {
             authSession.setAuthNote(MFA_CHALLENGE_SENT, MFA_CHALLENGE_SENT);
-            MfaResponse response = MfaHelper.getMfaRequest(context).send(context.getUser().getAttributes());
+            MfaResponse response = MfaRequest.buildRequest(context).send(context.getUser().getAttributes());
             error = response.getError();
         }
 
