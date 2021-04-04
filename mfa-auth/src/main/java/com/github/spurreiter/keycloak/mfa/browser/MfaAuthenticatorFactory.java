@@ -7,6 +7,8 @@ import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.provider.ProviderConfigurationBuilder;
+
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 import static org.keycloak.provider.ProviderConfigProperty.ROLE_TYPE;
 
@@ -32,17 +34,17 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public void init(Config.Scope config) {
-        //NOOP
+        // NOOP
     }
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-        //NOOP
+        // NOOP
     }
 
     @Override
     public void close() {
-        //NOOP
+        // NOOP
     }
 
     @Override
@@ -65,7 +67,6 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
         return true;
     }
 
-
     @Override
     public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
         return REQUIREMENT_CHOICES;
@@ -83,39 +84,28 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
-        ProviderConfigProperty restEndpoint = new ProviderConfigProperty();
-        restEndpoint.setType(STRING_TYPE);
-        restEndpoint.setName(REST_ENDPOINT);
-        restEndpoint.setLabel("REST endpoint");
-        restEndpoint.setHelpText("REST endpoint to send OTP.");
-        restEndpoint.setDefaultValue("http://localhost:1080/mfa");
+        return ProviderConfigurationBuilder.create()
 
-        ProviderConfigProperty restEndpointUser = new ProviderConfigProperty();
-        restEndpointUser.setType(STRING_TYPE);
-        restEndpointUser.setName(REST_ENDPOINT_USER);
-        restEndpointUser.setLabel("Username");
-        restEndpointUser.setHelpText("Basic-auth Username for REST endpoint");
+                .property().name(REST_ENDPOINT).label("REST endpoint")
+                .helpText("REST endpoint to send the email for verification. "
+                        + "If EnvVar MFA_URL is defined a relative URL can be set.")
+                .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa").add()
 
-        ProviderConfigProperty restEndpointPwd = new ProviderConfigProperty();
-        restEndpointPwd.setType(STRING_TYPE);
-        restEndpointPwd.setName(REST_ENDPOINT_PWD);
-        restEndpointPwd.setLabel("Password");
-        restEndpointPwd.setHelpText("Basic-auth Password for REST endpoint");
+                .property().name(REST_ENDPOINT_USER).label("Username")
+                .helpText("Basic-auth Username for REST endpoint. EnvVar MFA_USERNAME is used alternatively.")
+                .type(STRING_TYPE).add()
 
-        ProviderConfigProperty forceOtpUserAttribute = new ProviderConfigProperty();
-        forceOtpUserAttribute.setType(STRING_TYPE);
-        forceOtpUserAttribute.setName(OTP_AUTH_KEY);
-        forceOtpUserAttribute.setLabel("OTP control User Attribute");
-        forceOtpUserAttribute.setHelpText("The name of the user attribute to explicitly control OTP auth.");
-        forceOtpUserAttribute.setDefaultValue(OTP_AUTH);
+                .property().name(REST_ENDPOINT_PWD).label("Password")
+                .helpText("Basic-auth Password for REST endpoint. EnvVar MFA_PASSWORD is used alternatively.")
+                .type(STRING_TYPE).add()
 
-        ProviderConfigProperty forceOtpRole = new ProviderConfigProperty();
-        forceOtpRole.setType(ROLE_TYPE);
-        forceOtpRole.setName(OTP_ROLE_KEY);
-        forceOtpRole.setLabel("Force OTP for Role");
-        forceOtpRole.setHelpText("OTP is always required if user has the given Role.");
-        forceOtpRole.setDefaultValue(OTP_ROLE);
+                .property().name(OTP_AUTH_KEY).label("OTP control User Attribute")
+                .helpText("The name of the user attribute to explicitly control OTP auth.").type(STRING_TYPE)
+                .defaultValue(OTP_AUTH).add()
 
-        return asList(restEndpoint, restEndpointUser, restEndpointPwd, forceOtpUserAttribute, forceOtpRole);
+                .property().name(OTP_ROLE_KEY).label("Force OTP for Role")
+                .helpText("OTP is always required if user has the given Role.").type(ROLE_TYPE).add()
+
+                .build();
     }
 }

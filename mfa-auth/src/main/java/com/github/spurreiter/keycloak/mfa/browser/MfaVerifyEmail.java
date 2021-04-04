@@ -30,7 +30,7 @@ import org.keycloak.models.RealmModel;
 
 public class MfaVerifyEmail implements Authenticator {
 
-    private static final Logger log = Logger.getLogger(MfaVerifyEmail.class);
+    private static final Logger logger = Logger.getLogger(MfaVerifyEmail.class);
 
     public static final String MFA_CHALLENGE_SENT = "mfaChallengeSent";
 
@@ -74,7 +74,7 @@ public class MfaVerifyEmail implements Authenticator {
 
         try {
             String link = getVerifyEmailToken(context);
-            log.infof("token=%s", link);
+            logger.infof("token=%s", link);
             MfaResponse response = MfaRequest.buildRequest(context).sendVerifyEmail(user.getAttributes(), link,
                     getExpirationInMinutes(context.getRealm()));
             String error = response.getError();
@@ -84,7 +84,7 @@ public class MfaVerifyEmail implements Authenticator {
                 throw new Exception(error);
             }
         } catch (Exception e) {
-            log.error("Failed to generate email verification link", e);
+            logger.error("Failed to generate email verification link", e);
             event.error(Errors.EMAIL_SEND_FAILED);
             form.setError(Messages.EMAIL_SENT_ERROR);
         }
@@ -98,7 +98,7 @@ public class MfaVerifyEmail implements Authenticator {
         UserModel user = context.getUser();
         String email = user.getEmail();
 
-        log.infof("user=%s email=%s emailv=%s", user.getUsername(), user.getEmail(), user.isEmailVerified());
+        logger.infof("user=%s email=%s emailv=%s", user.getUsername(), user.getEmail(), user.isEmailVerified());
 
         if (email != null && !user.isEmailVerified()) {
             challengeFormResponse(context);

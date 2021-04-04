@@ -19,6 +19,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 
 import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.theme.Theme;
 
@@ -29,8 +30,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import static java.util.Arrays.asList;
-
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT;
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_USER;
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_PWD;
@@ -40,7 +39,7 @@ import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_ROLE_KEY;
 public class MfaDirectGrantAuthenticator extends AbstractDirectGrantAuthenticator {
     public static final String PROVIDER_ID = "auth-mfa-directgrant";
 
-    private static final Logger log = Logger.getLogger(MfaDirectGrantAuthenticator.class);
+    private static final Logger logger = Logger.getLogger(MfaDirectGrantAuthenticator.class);
 
     public static final String OTP_AUTH = "otpAuth";
     public static final String OTP_ROLE = "otp:auth";
@@ -65,15 +64,15 @@ public class MfaDirectGrantAuthenticator extends AbstractDirectGrantAuthenticato
         String username = user.getUsername();
 
         if (otp == null || otp.isEmpty()) {
-            log.infof("authenticate for username=%s", username);
+            logger.infof("authenticate for username=%s", username);
             MfaResponse response = MfaRequest.buildRequest(context).send(context.getUser().getAttributes());
             String error = response.getError();
 
             if (error == null) {
                 error = "mfa_sent";
-                log.infof("Mfa sent. realm=%s username=%s", realmname, username);
+                logger.infof("Mfa sent. realm=%s username=%s", realmname, username);
             } else {
-                log.warnf("Mfa failed. requestid=%s realm=%s username=%s error=%s", MfaHelper.getRequestId(context),
+                logger.warnf("Mfa failed. requestid=%s realm=%s username=%s error=%s", MfaHelper.getRequestId(context),
                         realmname, username, error);
             }
             challengeResponseFailed(context, error, getLocaleError(context, error));
@@ -83,7 +82,7 @@ public class MfaDirectGrantAuthenticator extends AbstractDirectGrantAuthenticato
         String error = response.getError();
 
         if (error != null) {
-            log.warnf("authentication failed. requestid=%s realm=%s username=%s error=%s",
+            logger.warnf("authentication failed. requestid=%s realm=%s username=%s error=%s",
                     MfaHelper.getRequestId(context), realmname, username, error);
             if (MfaResponse.ERR_INVALID.equals(error) || MfaResponse.ERR_TMP_UNAVAILABLE.equals(error)
                     || MfaResponse.ERR_SERVER_ERROR.equals(error)) {
@@ -94,7 +93,7 @@ public class MfaDirectGrantAuthenticator extends AbstractDirectGrantAuthenticato
             return;
         }
 
-        log.infof("authentication successful. realm=%s username=%s", realmname, username);
+        logger.infof("authentication successful. realm=%s username=%s", realmname, username);
         context.success();
     }
 
@@ -145,40 +144,29 @@ public class MfaDirectGrantAuthenticator extends AbstractDirectGrantAuthenticato
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
-        ProviderConfigProperty restEndpoint = new ProviderConfigProperty();
-        restEndpoint.setType(STRING_TYPE);
-        restEndpoint.setName(REST_ENDPOINT);
-        restEndpoint.setLabel("REST endpoint");
-        restEndpoint.setHelpText("REST endpoint to send OTP.");
-        restEndpoint.setDefaultValue("http://localhost:1080/mfa");
+        return ProviderConfigurationBuilder.create()
 
-        ProviderConfigProperty restEndpointUser = new ProviderConfigProperty();
-        restEndpointUser.setType(STRING_TYPE);
-        restEndpointUser.setName(REST_ENDPOINT_USER);
-        restEndpointUser.setLabel("Username");
-        restEndpointUser.setHelpText("Basic-auth Username for REST endpoint");
+                .property().name(REST_ENDPOINT).label("REST endpoint")
+                .helpText("REST endpoint to send the email for verification. "
+                        + "If EnvVar MFA_URL is defined a relative URL can be set.")
+                .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa").add()
 
-        ProviderConfigProperty restEndpointPwd = new ProviderConfigProperty();
-        restEndpointPwd.setType(STRING_TYPE);
-        restEndpointPwd.setName(REST_ENDPOINT_PWD);
-        restEndpointPwd.setLabel("Password");
-        restEndpointPwd.setHelpText("Basic-auth Password for REST endpoint");
+                .property().name(REST_ENDPOINT_USER).label("Username")
+                .helpText("Basic-auth Username for REST endpoint. EnvVar MFA_USERNAME is used alternatively.")
+                .type(STRING_TYPE).add()
 
-        ProviderConfigProperty forceOtpUserAttribute = new ProviderConfigProperty();
-        forceOtpUserAttribute.setType(STRING_TYPE);
-        forceOtpUserAttribute.setName(OTP_AUTH_KEY);
-        forceOtpUserAttribute.setLabel("OTP control User Attribute");
-        forceOtpUserAttribute.setHelpText("The name of the user attribute to explicitly control OTP auth.");
-        forceOtpUserAttribute.setDefaultValue(OTP_AUTH);
+                .property().name(REST_ENDPOINT_PWD).label("Password")
+                .helpText("Basic-auth Password for REST endpoint. EnvVar MFA_PASSWORD is used alternatively.")
+                .type(STRING_TYPE).add()
 
-        ProviderConfigProperty forceOtpRole = new ProviderConfigProperty();
-        forceOtpRole.setType(ROLE_TYPE);
-        forceOtpRole.setName(OTP_ROLE_KEY);
-        forceOtpRole.setLabel("Force OTP for Role");
-        forceOtpRole.setHelpText("OTP is always required if user has the given Role.");
-        forceOtpRole.setDefaultValue(OTP_ROLE);
+                .property().name(OTP_AUTH_KEY).label("OTP control User Attribute")
+                .helpText("The name of the user attribute to explicitly control OTP auth.").type(STRING_TYPE)
+                .defaultValue(OTP_AUTH).add()
 
-        return asList(restEndpoint, restEndpointUser, restEndpointPwd, forceOtpUserAttribute, forceOtpRole);
+                .property().name(OTP_ROLE_KEY).label("Force OTP for Role")
+                .helpText("OTP is always required if user has the given Role.").type(ROLE_TYPE).add()
+
+                .build();
     }
 
     @Override
@@ -209,7 +197,7 @@ public class MfaDirectGrantAuthenticator extends AbstractDirectGrantAuthenticato
             Locale locale = new Locale("en");
             msg = (String) theme.getMessages(locale).getProperty("mfaError." + error);
         } catch (IOException e) {
-            log.error(e.toString());
+            logger.error(e.toString());
         }
         if (msg == null) {
             msg = Messages.FAILED_TO_PROCESS_RESPONSE;

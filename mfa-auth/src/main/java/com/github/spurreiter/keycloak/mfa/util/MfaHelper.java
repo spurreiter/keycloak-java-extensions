@@ -3,8 +3,6 @@ package com.github.spurreiter.keycloak.mfa.util;
 import java.util.Collections;
 import java.util.Map;
 
-import com.github.spurreiter.keycloak.mfa.rest.MfaRequest;
-
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;

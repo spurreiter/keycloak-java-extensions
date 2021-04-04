@@ -28,7 +28,7 @@ import org.keycloak.models.RealmModel;
 
 public class MfaAuthenticator extends OTPFormAuthenticator {
 
-    private static final Logger log = Logger.getLogger(MfaAuthenticator.class);
+    private static final Logger logger = Logger.getLogger(MfaAuthenticator.class);
 
     public static final String MFA_CHALLENGE_SENT = "mfaChallengeSent";
     public static final String OTP_AUTH = "otpauth";
@@ -55,7 +55,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
             return;
         }
 
-        log.infof("authenticate for username=%s", username);
+        logger.infof("authenticate for username=%s", username);
 
         requestChallenge(context, username, context.getAuthenticationSession());
     }
@@ -77,7 +77,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
         String xRequestId = MfaHelper.getRequestId(context);
         boolean doExit = false;
 
-        log.infof("action. requestid=%s realm=%s username=%s", xRequestId, realm.getName(), username);
+        logger.infof("action. requestid=%s realm=%s username=%s", xRequestId, realm.getName(), username);
 
         MfaResponse response;
         String error;
@@ -97,7 +97,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
                 if (!UserAttributes.isPhoneVerified(user)) {
                     user.setSingleAttribute(UserAttributes.PHONE_NUMBER_VERIFIED, "true");                       
                 }
-                log.infof("authentication successful. realm=%s username=%s", realm.getName(), username);
+                logger.infof("authentication successful. realm=%s username=%s", realm.getName(), username);
                 context.getAuthenticationSession().removeAuthNote(MFA_CHALLENGE_SENT);
                 context.success();
                 return;
@@ -108,7 +108,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
 
         // failed -> exit
         if (doExit) {
-            log.infof("authentication failed. requestid=%s realm=%s username=%s error=%s", xRequestId, realm.getName(),
+            logger.infof("authentication failed. requestid=%s realm=%s username=%s error=%s", xRequestId, realm.getName(),
                     user.getUsername(), error);
             context.getEvent().user(user);
 
@@ -123,7 +123,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
         }
 
         // failed -> retry
-        log.infof("authentication attempt failed. Retrying requestid=%s realm=%s username=%s error=%s", xRequestId,
+        logger.infof("authentication attempt failed. Retrying requestid=%s realm=%s username=%s error=%s", xRequestId,
                 realm.getName(), user.getUsername(), error);
 
         Response formResponse = createChallengeFormResponse(context, error);
@@ -166,7 +166,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
             return;
         }
 
-        log.warnf("requestChallenge failed. requestId=%s username=%s error=%s", MfaHelper.getRequestId(context),
+        logger.warnf("requestChallenge failed. requestId=%s username=%s error=%s", MfaHelper.getRequestId(context),
                 username, error);
         String errorMessage = getLocaleError(context, error);
         context.forkWithErrorMessage(new FormMessage(errorMessage));
@@ -198,7 +198,7 @@ public class MfaAuthenticator extends OTPFormAuthenticator {
             Locale locale = session.getContext().resolveLocale(context.getUser());
             msg = (String) theme.getMessages(locale).getProperty("mfaError." + error);
         } catch (IOException e) {
-            log.error(e.toString());
+            logger.error(e.toString());
         }
         if (msg == null) {
             msg = Messages.FAILED_TO_PROCESS_RESPONSE;

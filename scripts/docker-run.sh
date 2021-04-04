@@ -12,10 +12,10 @@ else
 fi
 
 setcredentials() {
-  "$cwd/setcredentials.sh" 25
+  "$cwd/setcredentials.sh" 30
 }
 
-setcredentials &
+# setcredentials &
 
 docker run \
   -it --rm \
