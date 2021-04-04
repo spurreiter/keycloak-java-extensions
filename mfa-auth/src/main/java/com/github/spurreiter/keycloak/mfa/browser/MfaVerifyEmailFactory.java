@@ -10,16 +10,12 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
-import static org.keycloak.provider.ProviderConfigProperty.ROLE_TYPE;
 
 import java.util.List;
-import static java.util.Arrays.asList;
 
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT;
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_USER;
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_PWD;
-import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_AUTH_KEY;
-import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_ROLE_KEY;
 
 public class MfaVerifyEmailFactory implements AuthenticatorFactory {
 
@@ -87,7 +83,7 @@ public class MfaVerifyEmailFactory implements AuthenticatorFactory {
                 .property().name(REST_ENDPOINT).label("REST endpoint")
                 .helpText("REST endpoint to send the email for verification. "
                         + "If EnvVar MFA_URL is defined a relative URL can be set.")
-                .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa/verify-email").add()
+                .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa/send-email").add()
 
                 .property().name(REST_ENDPOINT_USER).label("Username")
                 .helpText("Basic-auth Username for REST endpoint. EnvVar MFA_USERNAME is used alternatively.")

@@ -55,26 +55,32 @@ public class MfaRequest {
     public static MfaRequest buildRequest(AuthenticationFlowContext context) {
         Map<String, String> config = MfaHelper.getConfig(context);
         String url = config.get(REST_ENDPOINT);
+        String username = config.get(REST_ENDPOINT_USER);
+        String password = config.get(REST_ENDPOINT_PWD);
+        return buildRequest(context, url, username, password);
+    }
+
+    public static MfaRequest buildRequest(AuthenticationFlowContext context, String url, String username, String password) {
         if (url == null || url.isBlank()) {
             url = "/";
         }
         if (url.charAt(0) == '/') {
             url = System.getenv("MFA_URL") + url;
         }
-        String basicUser = setValue(config.get(REST_ENDPOINT_USER), System.getenv("MFA_USERNAME"));
-        String basicPass = setValue(config.get(REST_ENDPOINT_PWD), System.getenv("MFA_PASSWORD"));
+        String basicUser = setValue(username, System.getenv("MFA_USERNAME"));
+        String basicPass = setValue(password, System.getenv("MFA_PASSWORD"));
         return new MfaRequest(url).setBasicAuth(basicUser, basicPass).setRequestId(MfaHelper.getRequestId(context));
     }
 
     public MfaResponse send(Map<String, List<String>> userAttributes) {
         HashMap<String, Object> map = new HashMap<>();
-        return request("POST", "/", "sendOtp", userAttributes, map);
+        return request("POST", "", "sendOtp", userAttributes, map);
     }
 
     public MfaResponse verify(Map<String, List<String>> userAttributes, String code) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("code", code);
-        return request("PUT", "/", "verifyOtp", userAttributes, map);
+        return request("PUT", "", "verifyOtp", userAttributes, map);
     }
 
     public MfaResponse sendVerifyEmail(Map<String, List<String>> userAttributes, String link,
@@ -82,7 +88,7 @@ public class MfaRequest {
         HashMap<String, Object> map = new HashMap<>();
         map.put("link", link);
         map.put("expirationInMinutes", expirationInMinutes);
-        return request("POST", "/", "sendVerifyEmail", userAttributes, map);
+        return request("POST", "", "sendVerifyEmail", userAttributes, map);
     }
 
     public MfaResponse sendResetEmail(Map<String, List<String>> userAttributes, String link,
@@ -90,7 +96,7 @@ public class MfaRequest {
         HashMap<String, Object> map = new HashMap<>();
         map.put("link", link);
         map.put("expirationInMinutes", expirationInMinutes);
-        return request("POST", "/", "sendResetEmail", userAttributes, map);
+        return request("POST", "", "sendResetEmail", userAttributes, map);
     }
 
     public MfaResponse request(String method, String pathname, String useCase, Map<String, List<String>> userAttributes, 
@@ -165,14 +171,14 @@ public class MfaRequest {
         }
     }
 
-    protected Response request(String method, String path, Entity<?> entity) {
+    protected Response request(String method, String pathname, Entity<?> entity) {
         ClientBuilder clientBuilder = ClientBuilder.newBuilder();
         clientBuilder.connectTimeout(5, TimeUnit.SECONDS);
         clientBuilder.readTimeout(5, TimeUnit.SECONDS);
 
         Client client = clientBuilder.build();
         try {
-            return client.target(this.url + path).request(MediaType.APPLICATION_JSON).headers(getHeaders())
+            return client.target(this.url + pathname).request(MediaType.APPLICATION_JSON).headers(getHeaders())
                     .method(method, entity);
         } catch (Exception e) {
             return null;

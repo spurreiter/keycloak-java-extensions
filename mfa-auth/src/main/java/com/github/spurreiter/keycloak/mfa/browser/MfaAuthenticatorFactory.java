@@ -20,8 +20,8 @@ import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_U
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_PWD;
 import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_AUTH_KEY;
 import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_ROLE_KEY;
-import static com.github.spurreiter.keycloak.mfa.browser.MfaAuthenticator.OTP_AUTH;
-import static com.github.spurreiter.keycloak.mfa.browser.MfaAuthenticator.OTP_ROLE;
+import static com.github.spurreiter.keycloak.mfa.browser.MfaForm.OTP_AUTH;
+import static com.github.spurreiter.keycloak.mfa.browser.MfaForm.OTP_ROLE;
 
 public class MfaAuthenticatorFactory implements AuthenticatorFactory {
 
@@ -29,7 +29,7 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public Authenticator create(KeycloakSession session) {
-        return new MfaAuthenticator(session);
+        return new MfaAuthenticator();
     }
 
     @Override
@@ -104,7 +104,8 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
                 .defaultValue(OTP_AUTH).add()
 
                 .property().name(OTP_ROLE_KEY).label("Force OTP for Role")
-                .helpText("OTP is always required if user has the given Role.").type(ROLE_TYPE).add()
+                .helpText("OTP is always required if user has the given Role.").type(ROLE_TYPE)
+                .defaultValue(OTP_ROLE).add()
 
                 .build();
     }
