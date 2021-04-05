@@ -23,7 +23,8 @@
 
 					<div class="${properties.kcInputWrapperClass!}">
 						<input id="otp" name="challenge_input" autocomplete="one-time-code" inputmode="numeric" maxlength="10"
-							type="text" required spellcheck="false" placeholder="${msg("mfaOtpEnterCodePlaceholder")}"
+							type="text" required spellcheck="false"
+							required
 							class="${properties.kcInputClass!}" autofocus />
 					</div>
 				</div>
