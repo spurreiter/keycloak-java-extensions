@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.spurreiter.keycloak</groupId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.1</version>
     <artifactId>keycloak-java-extensions</artifactId>
     <packaging>pom</packaging>
 
