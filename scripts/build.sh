@@ -12,8 +12,8 @@ files=(
 )
 
 _mvn(){
-  mvn clean install 
-  # mvn clean install -DskipTests
+  # mvn clean install 
+  mvn clean install -DskipTests
 }
 
 _clean(){

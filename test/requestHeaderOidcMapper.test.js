@@ -1,18 +1,19 @@
 const supertest = require('supertest')
 const assert = require('assert')
 
-const { CONFIG, testConnectKeycloak } = require('./support.js')
+const config = require('./config.js')
+const { testConnectKeycloak } = require('./support.js')
 
 describe('request-header-oidc-mapper', function () {
   before(function () {
-    return testConnectKeycloak()
+    return testConnectKeycloak(config)
   })
 
   const xSomeId = '57a5cb16-1344-470f-8168-24666af9605e'
   const xTenantId = 'eb6d4a17-aaba-48b0-9a42-b5f43eeaa8d6'
 
   it('shall return access token for service account', function () {
-    return supertest(CONFIG.keycloak.url)
+    return supertest(config.keycloak.url)
       .post('/auth/realms/my/protocol/openid-connect/token')
       .set({
         'x-tenant-id': xTenantId,
@@ -33,7 +34,7 @@ describe('request-header-oidc-mapper', function () {
   })
 
   it('shall fail if header is missing', function () {
-    return supertest(CONFIG.keycloak.url)
+    return supertest(config.keycloak.url)
       .post('/auth/realms/my/protocol/openid-connect/token')
       .set({
         'x-tenant-id': xTenantId
@@ -52,7 +53,7 @@ describe('request-header-oidc-mapper', function () {
   })
 
   it('shall fail if secret is missing', function () {
-    return supertest(CONFIG.keycloak.url)
+    return supertest(config.keycloak.url)
       .post('/auth/realms/my/protocol/openid-connect/token')
       .set({
         'x-tenant-id': xTenantId,

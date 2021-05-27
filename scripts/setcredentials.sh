@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 realm=my
 
 _exec(){
@@ -27,7 +29,10 @@ _setClientPassword(){
 }
 
 # _exec sh
+if [ $1 -gt 1 ]; then
+  sleep $1 
+fi
 _auth
-_createUser alice alice "-s email=alice@local.my -s emailVerified=true -s attributes.otpAuth=force" 
+_createUser alice alice "-s firstName=Alice -s lastName=Anders -s email=alice@local.my -s emailVerified=true -s attributes.otpauth=true -s attributes.phoneNumberVerified=false -s attributes.phoneNumber=\"+1800800800\"" 
 _createUser bob bob
 _setClientPassword my-client d0b8122f-8dfb-46b7-b68a-f5cc4e25d000

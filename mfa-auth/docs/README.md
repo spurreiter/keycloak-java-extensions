@@ -4,7 +4,7 @@ Multi-Factor-Authenticaton with generic REST endpoint.
 
 ## Overview 
 
-![overview](./mfa-auth.png)
+![overview](./mfa-auth.drawio.png)
 
 ## Config
 

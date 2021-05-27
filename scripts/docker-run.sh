@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 cwd=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 os=$(uname)
 
@@ -8,6 +10,12 @@ if [ $os = "Darwin" ]; then
 else 
   sed -i .bak "s#http://host.docker.internal:1080#http://localhost:1080#g" "$cwd/my-realm.json"
 fi
+
+setcredentials() {
+  "$cwd/setcredentials.sh" 30
+}
+
+# setcredentials &
 
 docker run \
   -it --rm \
@@ -22,6 +30,3 @@ docker run \
   -e KEYCLOAK_IMPORT=/tmp/my-realm.json \
   jboss/keycloak:12.0.4
 
-sleep 15
-
-$cwd/setcredentials.sh

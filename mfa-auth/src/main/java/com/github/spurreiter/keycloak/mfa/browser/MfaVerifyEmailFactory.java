@@ -10,26 +10,20 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
-import static org.keycloak.provider.ProviderConfigProperty.ROLE_TYPE;
 
 import java.util.List;
-import static java.util.Arrays.asList;
 
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT;
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_USER;
 import static com.github.spurreiter.keycloak.mfa.rest.MfaRequest.REST_ENDPOINT_PWD;
-import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_AUTH_KEY;
-import static com.github.spurreiter.keycloak.mfa.util.MfaHelper.OTP_ROLE_KEY;
-import static com.github.spurreiter.keycloak.mfa.browser.MfaForm.OTP_AUTH;
-import static com.github.spurreiter.keycloak.mfa.browser.MfaForm.OTP_ROLE;
 
-public class MfaAuthenticatorFactory implements AuthenticatorFactory {
+public class MfaVerifyEmailFactory implements AuthenticatorFactory {
 
-    public static final String PROVIDER_ID = "auth-mfa-form";
+    public static final String PROVIDER_ID = "verify-email-mfa-form";
 
     @Override
     public Authenticator create(KeycloakSession session) {
-        return new MfaAuthenticator();
+        return new MfaVerifyEmail(session);
     }
 
     @Override
@@ -74,12 +68,12 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public String getDisplayType() {
-        return "MFA Auth Form";
+        return "MFA Verify Email";
     }
 
     @Override
     public String getHelpText() {
-        return "Validates a OTP on a separate OTP form. OTP is sent via REST endpoint.";
+        return "Verifies Email.";
     }
 
     @Override
@@ -89,7 +83,7 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
                 .property().name(REST_ENDPOINT).label("REST endpoint")
                 .helpText("REST endpoint to send the email for verification. "
                         + "If EnvVar MFA_URL is defined a relative URL can be set.")
-                .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa").add()
+                .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa/send-email").add()
 
                 .property().name(REST_ENDPOINT_USER).label("Username")
                 .helpText("Basic-auth Username for REST endpoint. EnvVar MFA_USERNAME is used alternatively.")
@@ -98,14 +92,6 @@ public class MfaAuthenticatorFactory implements AuthenticatorFactory {
                 .property().name(REST_ENDPOINT_PWD).label("Password")
                 .helpText("Basic-auth Password for REST endpoint. EnvVar MFA_PASSWORD is used alternatively.")
                 .type(STRING_TYPE).add()
-
-                .property().name(OTP_AUTH_KEY).label("OTP control User Attribute")
-                .helpText("The name of the user attribute to explicitly control OTP auth.").type(STRING_TYPE)
-                .defaultValue(OTP_AUTH).add()
-
-                .property().name(OTP_ROLE_KEY).label("Force OTP for Role")
-                .helpText("OTP is always required if user has the given Role.").type(ROLE_TYPE)
-                .defaultValue(OTP_ROLE).add()
 
                 .build();
     }

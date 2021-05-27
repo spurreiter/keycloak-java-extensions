@@ -1,5 +1,6 @@
 package com.github.spurreiter.keycloak.mfa.rest;
 
+import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.common.util.Base64;
 import org.jboss.logging.Logger;
 
@@ -21,9 +22,14 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.spurreiter.keycloak.mfa.util.MfaHelper;
 
 public class MfaRequest {
-    private static final Logger log = Logger.getLogger(MfaRequest.class);
+    private static final Logger logger = Logger.getLogger(MfaRequest.class);
+
+    public static final String REST_ENDPOINT = "restEndpoint";
+    public static final String REST_ENDPOINT_USER = "restEndpointUser";
+    public static final String REST_ENDPOINT_PWD = "restEndpointPwd";
 
     private String url;
 
@@ -38,29 +44,70 @@ public class MfaRequest {
         this.url = url;
     }
 
+    private static String setValue (String str, String def) {
+        if (str == null || str.isBlank()) {
+            return def; 
+        } else {
+            return str;
+        }
+    }
+
+    public static MfaRequest buildRequest(AuthenticationFlowContext context) {
+        Map<String, String> config = MfaHelper.getConfig(context);
+        String url = config.get(REST_ENDPOINT);
+        String username = config.get(REST_ENDPOINT_USER);
+        String password = config.get(REST_ENDPOINT_PWD);
+        return buildRequest(context, url, username, password);
+    }
+
+    public static MfaRequest buildRequest(AuthenticationFlowContext context, String url, String username, String password) {
+        if (url == null || url.isBlank()) {
+            url = "/";
+        }
+        if (url.charAt(0) == '/') {
+            url = System.getenv("MFA_URL") + url;
+        }
+        String basicUser = setValue(username, System.getenv("MFA_USERNAME"));
+        String basicPass = setValue(password, System.getenv("MFA_PASSWORD"));
+        return new MfaRequest(url).setBasicAuth(basicUser, basicPass).setRequestId(MfaHelper.getRequestId(context));
+    }
+
     public MfaResponse send(Map<String, List<String>> userAttributes) {
-        String nonce = UUID.randomUUID().toString();
         HashMap<String, Object> map = new HashMap<>();
-        map.put("nonce", nonce);
-
-        String json = jsonBuilder(userAttributes, map);
-        Response response = request("POST", "/", Entity.entity(json, MediaType.APPLICATION_JSON));
-        logResponse(response, "send");
-
-        MfaResponse mfaRes = new MfaResponse(response);
-        mfaRes.verifyNonce(nonce);
-        return mfaRes;
+        return request("POST", "", "sendOtp", userAttributes, map);
     }
 
     public MfaResponse verify(Map<String, List<String>> userAttributes, String code) {
-        String nonce = UUID.randomUUID().toString();
         HashMap<String, Object> map = new HashMap<>();
         map.put("code", code);
+        return request("PUT", "", "verifyOtp", userAttributes, map);
+    }
+
+    public MfaResponse sendVerifyEmail(Map<String, List<String>> userAttributes, String link,
+            long expirationInMinutes) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("link", link);
+        map.put("expirationInMinutes", expirationInMinutes);
+        return request("POST", "", "sendVerifyEmail", userAttributes, map);
+    }
+
+    public MfaResponse sendResetEmail(Map<String, List<String>> userAttributes, String link,
+            long expirationInMinutes) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("link", link);
+        map.put("expirationInMinutes", expirationInMinutes);
+        return request("POST", "", "sendResetEmail", userAttributes, map);
+    }
+
+    public MfaResponse request(String method, String pathname, String useCase, Map<String, List<String>> userAttributes, 
+            HashMap<String, Object> map) {
+        String nonce = UUID.randomUUID().toString();
+        map.put("useCase", useCase);
         map.put("nonce", nonce);
 
         String json = jsonBuilder(userAttributes, map);
-        Response response = request("PUT", "/verify", Entity.entity(json, MediaType.APPLICATION_JSON));
-        logResponse(response, "verify");
+        Response response = request(method, pathname, Entity.entity(json, MediaType.APPLICATION_JSON));
+        logResponse(response, useCase);
 
         MfaResponse mfaRes = new MfaResponse(response);
         mfaRes.verifyNonce(nonce);
@@ -96,11 +143,6 @@ public class MfaRequest {
         return headers;
     }
 
-    // private static String jsonBuilder(Map<String, List<String>> userAttributes) {
-    //     HashMap<String, Object> map = new HashMap<>();
-    //     return jsonBuilder(userAttributes, map);
-    // }
-
     private static String jsonBuilder(Map<String, List<String>> userAttributes, HashMap<String, Object> map) {
         userAttributes.entrySet().stream().forEach(e -> {
             String key = e.getKey();
@@ -112,7 +154,7 @@ public class MfaRequest {
             String json = new ObjectMapper().writeValueAsString(map);
             return json;
         } catch (JsonProcessingException e) {
-            log.error(e);
+            logger.error(e);
         }
         return "null";
     }
@@ -123,20 +165,20 @@ public class MfaRequest {
             status = response.getStatus();
         }
         if (status >= 500) {
-            log.errorf("request failed. state=%s status=%s", state, status);
+            logger.errorf("request failed. state=%s status=%s", state, status);
         } else if (status >= 400) {
-            log.warnf("request failed. state=%s status=%s", state, status);
+            logger.warnf("request failed. state=%s status=%s", state, status);
         }
     }
 
-    protected Response request(String method, String path, Entity<?> entity) {
+    protected Response request(String method, String pathname, Entity<?> entity) {
         ClientBuilder clientBuilder = ClientBuilder.newBuilder();
         clientBuilder.connectTimeout(5, TimeUnit.SECONDS);
         clientBuilder.readTimeout(5, TimeUnit.SECONDS);
 
         Client client = clientBuilder.build();
         try {
-            return client.target(this.url + path).request(MediaType.APPLICATION_JSON).headers(getHeaders())
+            return client.target(this.url + pathname).request(MediaType.APPLICATION_JSON).headers(getHeaders())
                     .method(method, entity);
         } catch (Exception e) {
             return null;
