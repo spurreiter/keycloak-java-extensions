@@ -119,7 +119,7 @@ public class MfaResetCredential implements Authenticator, AuthenticatorFactory {
         // We send the secret in the email in a link as a query param.
         String authSessionEncodedId = AuthenticationSessionCompoundId.fromAuthSession(authenticationSession)
                 .getEncodedId();
-        ResetCredentialsActionToken token = new ResetCredentialsActionToken(user.getId(), absoluteExpirationInSecs,
+        ResetCredentialsActionToken token = new ResetCredentialsActionToken(user.getId(), user.getEmail(), absoluteExpirationInSecs,
                 authSessionEncodedId, authenticationSession.getClient().getClientId());
         String link = UriBuilder
                 .fromUri(context.getActionTokenUrl(
