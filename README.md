@@ -18,16 +18,18 @@ The server starts with a sample realm `my` with all extensions configured.
 # start server
 ./scripts/docker-run.sh
 # deploy ear 
-./scripts/deploy.sh
+./scripts/build.sh
 # add users if server is up
-./scripts/setcredentials.sh
+./scripts/create-users.js
+# start the test server for OTP
+npm start
 ```
 
 ## development
 
 build extensions
 ```sh
-./scripts/deploy.sh
+./scripts/build.sh
 ```
 
 run integration tests (uses nodejs) 

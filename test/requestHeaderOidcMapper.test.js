@@ -9,6 +9,8 @@ describe('request-header-oidc-mapper', function () {
     return testConnectKeycloak(config)
   })
 
+  const clientSecret = 'e7138d77-d492-4d54-b71d-0ad92070059c'
+
   const xSomeId = '57a5cb16-1344-470f-8168-24666af9605e'
   const xTenantId = 'eb6d4a17-aaba-48b0-9a42-b5f43eeaa8d6'
 
@@ -22,7 +24,7 @@ describe('request-header-oidc-mapper', function () {
       .type('form')
       .send({
         client_id: 'my-client',
-        client_secret: 'd0b8122f-8dfb-46b7-b68a-f5cc4e25d000',
+        client_secret: clientSecret,
         grant_type: 'client_credentials',
         scope: 'openid'
       })
@@ -42,7 +44,7 @@ describe('request-header-oidc-mapper', function () {
       .type('form')
       .send({
         client_id: 'my-client',
-        client_secret: 'd0b8122f-8dfb-46b7-b68a-f5cc4e25d000',
+        client_secret: clientSecret,
         grant_type: 'client_credentials',
         scope: 'openid'
       })

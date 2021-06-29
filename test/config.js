@@ -3,7 +3,7 @@ const config = {
     url: 'http://localhost:8080'
   },
   rest: {
-    host: 'localhost',
+    host: '0.0.0.0',
     port: 1080
   },
   client: {
