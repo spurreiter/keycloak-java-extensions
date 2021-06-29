@@ -1596,7 +1596,7 @@
       ],
       "publicClient": false,
       "redirectUris": [],
-      "secret": "**********",
+      "secret": "e7138d77-d492-4d54-b71d-0ad92070059c",
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
       "surrogateAuthRequired": false,
