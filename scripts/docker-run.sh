@@ -32,7 +32,7 @@ docker run \
   -v ${cwd}/my-realm.json:/tmp/my-realm.json \
   -v ${cwd}/../deployments:/opt/jboss/keycloak/standalone/deployments \
   -e KEYCLOAK_IMPORT=/tmp/my-realm.json \
-  jboss/keycloak:14.0.0
+  jboss/keycloak:15.0.2
 
 #  -v ${cwd}/configuration-13.0.1:/opt/jboss/keycloak/standalone/configuration \
 

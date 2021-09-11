@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.spurreiter.keycloak</groupId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.3-SNAPSHOT</version>
     <artifactId>keycloak-java-extensions</artifactId>
     <packaging>pom</packaging>
 
@@ -22,7 +22,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <!-- dependency versions -->
-        <keycloak.version>14.0.0</keycloak.version>
+        <keycloak.version>15.0.2</keycloak.version>
 
         <lombok.version>1.18.20</lombok.version>
         <jboss-jaxrs-api.version>2.0.1.Final</jboss-jaxrs-api.version>
