@@ -2,6 +2,8 @@ const supertest = require('supertest')
 const express = require('express')
 const log = require('debug')('test:mfa')
 
+const CODE = '000000'
+
 /**
  * if fails start docker container with
  * `./scripts/docker-run.sh`
@@ -12,6 +14,8 @@ const testConnectKeycloak = (config) => supertest(config.keycloak.url).get('/aut
 
 const mfaMockServer = () => {
   const app = express()
+
+  console.log(`Answer with OTP-Code "${CODE}"`)
 
   // logger and body-parser - is unsafe
   app.use((req, res, next) => {
@@ -44,7 +48,7 @@ const mfaMockServer = () => {
     const { code, nonce } = req.body
     let status = 200
     let body = { nonce }
-    if (code !== '000000') {
+    if (code !== CODE) {
       status = 403
       body = { status, error: 'mfa_invalid' }
     }
