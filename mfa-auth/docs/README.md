@@ -29,4 +29,4 @@ The REST Endpoint handles:
 
 For documentation of the API and a sample implementation please check [keycloak-ldap][].
 
-[keycloak-ldap]: https://github.com/spurreiter/keycloak-ldap/docs/mfa-api.md
+[keycloak-ldap]: https://github.com/spurreiter/keycloak-ldap/blob/master/docs/mfa-api.md
