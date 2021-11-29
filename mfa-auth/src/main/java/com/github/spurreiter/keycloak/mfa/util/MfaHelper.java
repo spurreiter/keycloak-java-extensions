@@ -32,7 +32,7 @@ public class MfaHelper {
         String roleName = config.get(OTP_ROLE_KEY);
 
         if (attribute != null) {
-            useOtp = user.getAttributeStream(attribute).findFirst().isPresent();
+            useOtp = UserAttributes.getBoolean(user, attribute);
         }
 
         if (!useOtp && roleName != null) {
