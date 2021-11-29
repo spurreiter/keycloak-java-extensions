@@ -29,6 +29,9 @@ docker run \
   -e KEYCLOAK_USER=admin \
   -e KEYCLOAK_PASSWORD=admin \
   -e KEYCLOAK_LOGLEVEL=INFO \
+  -p 8787:8787 \
+  -e DEBUG=true \
+  -e DEBUG_PORT='*:8787' \
   -v ${cwd}/my-realm.json:/tmp/my-realm.json \
   -v ${cwd}/../deployments:/opt/jboss/keycloak/standalone/deployments \
   -e KEYCLOAK_IMPORT=/tmp/my-realm.json \
