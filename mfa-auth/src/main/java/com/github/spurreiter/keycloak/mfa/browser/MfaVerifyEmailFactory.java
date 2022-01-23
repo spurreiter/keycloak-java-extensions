@@ -80,19 +80,19 @@ public class MfaVerifyEmailFactory implements AuthenticatorFactory {
     public List<ProviderConfigProperty> getConfigProperties() {
         return ProviderConfigurationBuilder.create()
 
-                .property().name(REST_ENDPOINT).label("REST endpoint")
-                .helpText("REST endpoint to send the email for verification. "
-                        + "If EnvVar MFA_URL is defined a relative URL can be set.")
-                .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa/send-email").add()
+            .property().name(REST_ENDPOINT).label("REST endpoint")
+            .helpText("REST endpoint to send the email for verification. "
+                    + "If EnvVar MFA_URL is defined a relative URL can be set.")
+            .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa/send-email").add()
 
-                .property().name(REST_ENDPOINT_USER).label("Username")
-                .helpText("Basic-auth Username for REST endpoint. EnvVar MFA_USERNAME is used alternatively.")
-                .type(STRING_TYPE).add()
+            .property().name(REST_ENDPOINT_USER).label("Username")
+            .helpText("Basic-auth Username for REST endpoint. EnvVar MFA_USERNAME is used alternatively.")
+            .type(STRING_TYPE).add()
 
-                .property().name(REST_ENDPOINT_PWD).label("Password")
-                .helpText("Basic-auth Password for REST endpoint. EnvVar MFA_PASSWORD is used alternatively.")
-                .type(STRING_TYPE).add()
+            .property().name(REST_ENDPOINT_PWD).label("Password")
+            .helpText("Basic-auth Password for REST endpoint. EnvVar MFA_PASSWORD is used alternatively.")
+            .type(STRING_TYPE).add()
 
-                .build();
+            .build();
     }
 }

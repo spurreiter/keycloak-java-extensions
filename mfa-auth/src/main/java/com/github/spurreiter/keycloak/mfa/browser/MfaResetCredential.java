@@ -269,32 +269,32 @@ public class MfaResetCredential implements Authenticator, AuthenticatorFactory {
     public List<ProviderConfigProperty> getConfigProperties() {
         return ProviderConfigurationBuilder.create()
 
-                .property().name(REST_ENDPOINT).label("REST endpoint")
-                .helpText("REST endpoint to send the OTP for reset. "
-                        + "If EnvVar MFA_URL is defined a relative URL can be set.")
-                .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa").add()
+            .property().name(REST_ENDPOINT).label("REST endpoint")
+            .helpText("REST endpoint to send the OTP for reset. "
+                    + "If EnvVar MFA_URL is defined a relative URL can be set.")
+            .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa").add()
 
-                .property().name(REST_ENDPOINT_USER).label("Username").helpText("Basic-auth Username for REST endpoint")
-                .type(STRING_TYPE).add()
+            .property().name(REST_ENDPOINT_USER).label("Username").helpText("Basic-auth Username for REST endpoint")
+            .type(STRING_TYPE).add()
 
-                .property().name(REST_ENDPOINT_PWD).label("Password").helpText("Basic-auth Password for REST endpoint")
-                .type(STRING_TYPE).add()
+            .property().name(REST_ENDPOINT_PWD).label("Password").helpText("Basic-auth Password for REST endpoint")
+            .type(STRING_TYPE).add()
 
-                .property().name(USE_REALM_EMAIL_PROVIDER).label("Use Realm Email Provider")
-                .helpText("Use Realm Email Provider instead of REST Endpoint (Email).").type(BOOLEAN_TYPE).add()
+            .property().name(USE_REALM_EMAIL_PROVIDER).label("Use Realm Email Provider")
+            .helpText("Use Realm Email Provider instead of REST Endpoint (Email).").type(BOOLEAN_TYPE).add()
 
-                .property().name(REST_ENDPOINT_EMAIL).label("REST endpoint (Email)")
-                .helpText("REST endpoint to send the OTP for reset. "
-                        + "If EnvVar MFA_URL is defined a relative URL can be set.")
-                .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa").add()
+            .property().name(REST_ENDPOINT_EMAIL).label("REST endpoint (Email)")
+            .helpText("REST endpoint to send the OTP for reset. "
+                    + "If EnvVar MFA_URL is defined a relative URL can be set.")
+            .type(STRING_TYPE).defaultValue("http://localhost:1080/mfa").add()
 
-                .property().name(REST_ENDPOINT_EMAIL_USER).label("Username (Email)")
-                .helpText("Basic-auth Username for REST endpoint (Email)").type(STRING_TYPE).add()
+            .property().name(REST_ENDPOINT_EMAIL_USER).label("Username (Email)")
+            .helpText("Basic-auth Username for REST endpoint (Email)").type(STRING_TYPE).add()
 
-                .property().name(REST_ENDPOINT_EMAIL_PWD).label("Password (Email)")
-                .helpText("Basic-auth Password for REST endpoint (Email)").type(STRING_TYPE).add()
+            .property().name(REST_ENDPOINT_EMAIL_PWD).label("Password (Email)")
+            .helpText("Basic-auth Password for REST endpoint (Email)").type(STRING_TYPE).add()
 
-                .build();
+            .build();
     }
 
     @Override
