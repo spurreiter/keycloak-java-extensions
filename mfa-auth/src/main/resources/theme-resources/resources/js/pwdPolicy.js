@@ -7,6 +7,12 @@
     successIcon: 'fa fa-fw fa-check-circle'
   }
 
+  if (_passwordPolicy) {
+    ;['notUsername', 'notEmail'].forEach(function (key) {
+      _passwordPolicy[key] = key in _passwordPolicy
+    })
+  }
+
   document.head.append(h('style', {}, `
     .pwd-info {
       padding: 0 0.5em;
@@ -52,7 +58,7 @@
     }
   `))
 
-  const $pwdnew = document.getElementById('password-new')
+  const $pwdnew = document.getElementById('password')
   const $pwdconfirm = document.getElementById('password-confirm')
   const $input = document.querySelector('input[type=submit]')
   const $info = document.getElementById('passwordPolicy')

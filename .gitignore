@@ -7,6 +7,7 @@ target/
 .settings
 deployments/*-SNAPSHOT.jar
 deployments/*-SNAPSHOT.ear
+devresources/
 node_modules
 scripts/configuration/
 *.bak

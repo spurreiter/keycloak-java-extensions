@@ -22,7 +22,7 @@
   "scripts": {
     "start": "node test/dev.js",
     "test": "DEBUG=test* mocha",
-    "dev": "browser-sync start --listen localhost --port 8000 --server --no-ui --watch --files ./*.yaml --no-notify"
+    "dev:js": "browser-sync start --startPath mfa-auth/src/test/resources/mfa-login-update-password.html --listen localhost --port 8000 --server --no-ui --watch --files mfa-auth --no-notify"
   },
   "devDependencies": {
     "@keycloak/keycloak-admin-client": "^16.1.1",
@@ -38,7 +38,6 @@
     "keycloak-connect": "^16.1.1",
     "mailparser": "^3.4.0",
     "mocha": "^9.2.0",
-    "shelljs": "^0.8.5",
     "smtp-server": "^3.9.0",
     "supertest": "^6.2.2",
     "wait-on": "^6.0.0",
