@@ -1859,14 +1859,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-sha256-pairwise-sub-mapper",
             "oidc-address-mapper",
-            "saml-role-list-mapper",
-            "oidc-usermodel-property-mapper",
             "oidc-full-name-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
             "oidc-usermodel-attribute-mapper",
-            "saml-user-property-mapper",
-            "saml-user-attribute-mapper"
+            "oidc-usermodel-property-mapper",
+            "saml-role-list-mapper",
+            "saml-user-attribute-mapper",
+            "saml-user-property-mapper"
           ]
         },
         "id": "3043059e-b31e-444a-8a56-9cab92921478",
@@ -1894,14 +1894,14 @@
       {
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-property-mapper",
             "oidc-address-mapper",
             "oidc-full-name-mapper",
-            "oidc-usermodel-property-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
             "oidc-usermodel-attribute-mapper",
+            "oidc-usermodel-property-mapper",
             "saml-role-list-mapper",
             "saml-user-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper"
+            "saml-user-property-mapper"
           ]
         },
         "id": "c8c28afe-e00f-4f18-9c2b-cfe806d3ab00",
@@ -1946,7 +1946,7 @@
   "identityProviderMappers": [],
   "identityProviders": [],
   "internationalizationEnabled": true,
-  "keycloakVersion": "12.0.4",
+  "keycloakVersion": "16.1.0",
   "loginWithEmailAllowed": true,
   "maxDeltaTimeSeconds": 43200,
   "maxFailureWaitSeconds": 900,
@@ -1969,7 +1969,7 @@
   "quickLoginCheckMilliSeconds": 1000,
   "realm": "my",
   "refreshTokenMaxReuse": 0,
-  "registrationAllowed": false,
+  "registrationAllowed": true,
   "registrationEmailAsUsername": false,
   "registrationFlow": "registration",
   "rememberMe": true,
@@ -2383,7 +2383,14 @@
       ]
     }
   ],
-  "smtpServer": {},
+  "smtpServer": {
+    "auth": "",
+    "from": "mail@me.local",
+    "host": "host.docker.internal",
+    "port": "1025",
+    "ssl": "",
+    "starttls": ""
+  },
   "sslRequired": "external",
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionIdleTimeoutRememberMe": 0,

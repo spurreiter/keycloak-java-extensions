@@ -4,7 +4,7 @@
  * script to setup realm
  */
 
-const KcAdmin = require('keycloak-admin').default
+const KcAdmin = require('@keycloak/keycloak-admin-client').default
 
 const log = console.log
 
@@ -107,13 +107,15 @@ async function importUsers (kc, users, { realm }) {
   }
 }
 
-if (module === require.main) {
-  async function main () {
-    const { realm } = config
-    const kc = await client(config)
-    await setAdmin(kc, adminUser)
-    await importUsers(kc, users, { realm })
-  }
+async function main () {
+  const { realm } = config
+  const kc = await client(config)
+  await setAdmin(kc, adminUser)
+  await importUsers(kc, users, { realm })
+}
 
+module.exports = main
+
+if (module === require.main) {
   main().catch(console.error)
 }

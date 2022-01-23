@@ -7,8 +7,6 @@ const CODE = '000000'
 /**
  * if fails start docker container with
  * `./scripts/docker-run.sh`
- * then add users with
- * `./scripts/setcredentials.sh`
  */
 const testConnectKeycloak = (config) => supertest(config.keycloak.url).get('/auth').expect(303)
 
