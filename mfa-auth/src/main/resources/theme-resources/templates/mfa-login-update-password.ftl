@@ -3,8 +3,8 @@
     <#if section = "header">
         ${msg("updatePasswordTitle")}
     <#elseif section = "form">
-        <div id="passwordPolicy">
-        </div>
+        <div id="passwordPolicy"></div>
+        
         <form id="kc-passwd-update-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <input type="text" id="username" name="username" value="${username}" autocomplete="username"
                    readonly="readonly" style="display:none;"/>
@@ -13,10 +13,10 @@
 
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="password-new" class="${properties.kcLabelClass!}">${msg("passwordNew")}</label>
+                    <label for="password" class="${properties.kcLabelClass!}">${msg("passwordNew")}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
-                    <input type="password" id="password-new" name="password-new" class="${properties.kcInputClass!}"
+                    <input type="password" id="password" name="password-new" class="${properties.kcInputClass!}"
                            autofocus autocomplete="new-password"
                            required
                            aria-invalid="<#if messagesPerField.existsError('password','password-confirm')>true</#if>"
@@ -72,7 +72,6 @@
                 </div>
             </div>
         </form>
-        <#if policy??>
         <script>
         try {
             var _messages = {
@@ -91,15 +90,13 @@
                 pwdMeterScore3: "${msg("pwdMeterScore3")}",
                 pwdMeterScore4: "${msg("pwdMeterScore4")}"
             }
+            <#if policy??>
             var _passwordPolicy = JSON.parse('${policy?no_esc}')
-            ;['notUsername', 'notEmail'].forEach(function (key) {
-                passwordPolicy[key] = key in passwordPolicy
-            })
+            </#if>
         } catch (e) {}
         </script>
         <script async type="text/javascript" src="${url.resourcesPath}/js/pwdPolicy.js"></script>
         <script async type="text/javascript" src="${url.resourcesPath}/js/pwdShowHide.js"></script>
         <script async type="text/javascript" src="${url.resourcesPath}/js/zxcvbn.js"></script>
-        </#if>
     </#if>
 </@layout.registrationLayout>

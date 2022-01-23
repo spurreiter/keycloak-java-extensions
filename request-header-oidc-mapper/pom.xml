@@ -6,7 +6,7 @@
     <parent>
         <artifactId>keycloak-java-extensions</artifactId>
         <groupId>com.github.spurreiter.keycloak</groupId>
-        <version>1.2.3</version>
+        <version>1.2.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

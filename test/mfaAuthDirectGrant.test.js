@@ -1,6 +1,6 @@
-const supertest = require('supertest')
 const assert = require('assert')
-
+const supertest = require('supertest')
+const createUsers = require('../scripts/create-users.js')
 const config = require('./config.js')
 const { testConnectKeycloak, mfaMockServer } = require('./support.js')
 
@@ -8,6 +8,10 @@ describe('mfa-auth direct grant', function () {
   const username = 'alice'
   const password = 'alice'
   const clientId = 'my-server'
+
+  before(async function () {
+    await createUsers()
+  })
 
   before(function () {
     // console.log(config)

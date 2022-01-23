@@ -1,8 +1,19 @@
 {
-  "private": true,
   "name": "@spurreiter/keycloak-java-extensions",
   "version": "1.2.3",
+  "private": true,
   "description": "",
+  "keywords": [],
+  "homepage": "https://github.com/spurreiter/keycloak-java-extensions#readme",
+  "bugs": {
+    "url": "https://github.com/spurreiter/keycloak-java-extensions/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spurreiter/keycloak-java-extensions.git"
+  },
+  "license": "Apache-2.0",
+  "author": "spurreiter",
   "main": "index.js",
   "directories": {
     "doc": "docs",
@@ -11,33 +22,25 @@
   "scripts": {
     "start": "node test/dev.js",
     "test": "DEBUG=test* mocha",
-    "dev": "browser-sync start --listen localhost --port 8000 --server --no-ui --watch --files ./*.yaml --no-notify"
+    "dev:js": "browser-sync start --startPath mfa-auth/src/test/resources/mfa-login-update-password.html --listen localhost --port 8000 --server --no-ui --watch --files mfa-auth --no-notify"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spurreiter/keycloak-java-extensions.git"
-  },
-  "keywords": [],
-  "author": "spurreiter",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/spurreiter/keycloak-java-extensions/issues"
-  },
-  "homepage": "https://github.com/spurreiter/keycloak-java-extensions#readme",
   "devDependencies": {
-    "browser-sync": "^2.26.14",
-    "debug": "^4.3.2",
-    "eslint": "^7.25.0",
-    "eslint-config-standard": "^16.0.2",
-    "eslint-plugin-import": "^2.22.1",
+    "@keycloak/keycloak-admin-client": "^16.1.1",
+    "browser-sync": "^2.27.7",
+    "debug": "^4.3.3",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
-    "express": "^4.17.1",
-    "express-session": "^1.17.1",
-    "keycloak-admin": "^1.14.13",
-    "keycloak-connect": "^12.0.4",
-    "mocha": "^8.3.2",
-    "supertest": "^6.1.3",
+    "express": "^4.17.2",
+    "express-session": "^1.17.2",
+    "keycloak-connect": "^16.1.1",
+    "mailparser": "^3.4.0",
+    "mocha": "^9.2.0",
+    "smtp-server": "^3.9.0",
+    "supertest": "^6.2.2",
+    "wait-on": "^6.0.0",
     "zxcvbn": "^4.4.2"
   }
 }

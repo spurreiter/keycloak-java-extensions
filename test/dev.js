@@ -1,11 +1,16 @@
 
-process.env.DEBUG = 'test*'
+process.env.DEBUG = 'test*,@my/paperbox:*'
 
 const config = require('./config.js')
 const { mfaMockServer } = require('./support.js')
 const { setup } = require('./client.js')
+const createUsers = require('../scripts/create-users.js')
 
-if (module === require.main) {
+require('../scripts/mail-server.js')
+
+const main = async () => {
+  await createUsers()
+
   const serverRest = mfaMockServer().start({
     ...config.rest,
     done: () => {
@@ -16,4 +21,8 @@ if (module === require.main) {
   const serverClient = setup().listen(config.client.port, config.client.host, () => {
     console.log('Client on http://%s:%s', serverClient.address().address, serverClient.address().port)
   })
+}
+
+if (module === require.main) {
+  main().catch(console.error)
 }

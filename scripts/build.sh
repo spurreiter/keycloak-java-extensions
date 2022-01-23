@@ -5,10 +5,9 @@ cwd=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 cd "$cwd/.."
 
 files=(
-  # "$cwd/../request-header-oidc-mapper/target/request-header-oidc-mapper*"
-  # "$cwd/../send-otp/target/send-otp*"
-  # "$cwd/../mfa-auth/target/mfa-auth*"
-  "$cwd/../extensions-ear/target/extensions-ear*"
+  "$cwd/../request-header-oidc-mapper/target/request-header-oidc-mapper*"
+  "$cwd/../mfa-auth/target/mfa-auth*"
+  # "$cwd/../extensions-ear/target/extensions-ear*"
 )
 
 _mvn(){
