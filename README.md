@@ -43,6 +43,7 @@ npm t
 set version
 ```sh
 mvn versions:set -DnewVersion=1.0.1-SNAPSHOT
+find . -iname "pom.xml.versionsBackup" | xargs rm
 ```
 
 ## license
