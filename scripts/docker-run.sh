@@ -6,6 +6,8 @@ cwd=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 os=$(uname)
 opts=
 
+. "$cwd/env"
+
 if [ $os = "Darwin" ]; then
   echo
   #sed -i .bak "s#http://localhost:1080#http://host.docker.internal:1080#g" "$cwd/my-realm.json"
@@ -35,7 +37,7 @@ docker run \
   -v ${cwd}/my-realm.json:/tmp/my-realm.json \
   -v ${cwd}/../deployments:/opt/jboss/keycloak/standalone/deployments \
   -e KEYCLOAK_IMPORT=/tmp/my-realm.json \
-  jboss/keycloak:15.0.2
+  $IMAGE
 
 #  -v ${cwd}/configuration-13.0.1:/opt/jboss/keycloak/standalone/configuration \
 

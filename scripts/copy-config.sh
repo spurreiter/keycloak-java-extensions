@@ -1,0 +1,1 @@
+docker cp kc-ext:/opt/jboss/keycloak/standalone/configuration .
